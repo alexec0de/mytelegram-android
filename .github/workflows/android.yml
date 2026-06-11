@@ -54,7 +54,7 @@ jobs:
       - name: Gradle build (Standalone, universal afat).
         run: |
           chmod +x gradlew
-          ./gradlew :TMessagesProj_AppStandalone:assembleAfatStandalone --no-daemon --stacktrace
+          ./gradlew :TMessagesProj_AppStandalone:assembleAfatDebug --no-daemon --stacktrace
         env:
           GRADLE_OPTS: -Xmx4g -Dfile.encoding=UTF-8
 
