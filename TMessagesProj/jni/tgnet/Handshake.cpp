@@ -363,23 +363,26 @@ void Handshake::processHandshakeResponse_resPQ(TLObject *message, int64_t messag
             }
         } else {
             if (serverPublicKeys.empty()) {
-                    serverPublicKeys.emplace_back("-----BEGIN RSA PUBLIC KEY-----\n"
-                                                      "MIIBCgKCAQEAu+3tvscWDAlEvVylTeMr5FpU2AjgqzoQHPjzp69r0YAtq0a8rX0M\n"
-                                                                 "Ue78F/FRAqBaEbZW6WBzF3AjOlNYpOtvvwGhl9rGCgziunbd9nwcKJBMDWS9O7Mz\n"
-                                                                 "/8xjz/swIB4V56XcjOhrjUHJ/GniFKoum00xeEcYnr5xnLesvpVMq97Ga6b+xt3H\n"
-                                                                 "RftHY/Zy1dG5zs8upuiAOlEiKilhu1IthfMjFG3NF6TiGrO9YU3YixFbJy67jtHk\n"
-                                                                 "v5FarscM2fC5iWQ2eP1y6jXR64sGU3QjncvozYOePrH9jGcnmzUmj42x/H28IjJQ\n"
-                                                                 "9EjEc22sPOuauK0IF2QiCGh+TfsKCK189wIDAQAB\n"
-                                                  "-----END RSA PUBLIC KEY-----");
-                        serverPublicKeysFingerprints.push_back(0xce27f5081215bda4);
+                serverPublicKeys.emplace_back("-----BEGIN RSA PUBLIC KEY-----\n"
+                                              "MIIBCgKCAQEAhUCF/p27uylgaSUNZk+jvjNhhUEv0wZDodxOVr7uiXJpHl6VLMAX\n"
+                                              "KchWQLSYsI8Ni3nu4Kscuwlv5QedCWOMXK6j8uw6URwJu5+9iJikc2NjfFUdJ0Xh\n"
+                                              "Xlx7ZLtxFwwwBAIVck3wIGZg6ntE3e6n/JNRfNS83m6SPL6VQxxurS5mPJVlR1+I\n"
+                                              "WQNxGiSUyIBA/LHhGsDisQwe4CX9r8UDn7ZnZtgG0GGnd6hliTBil8ixs4sAl+wc\n"
+                                              "ICFde8RiA4wGY6HsfEL94DUDOOkYLrhoYJJKifFCtxDXvkzEqF5M7kmsZG2Gy3cz\n"
+                                              "r8syNPw+4W23uM398eHKhPWOqnubZMndeQIDAQAB\n"
+                                              "-----END RSA PUBLIC KEY-----");
+                serverPublicKeysFingerprints.push_back(0x010001030279ddc9); // фингер
             }
 
             size_t count2 = serverPublicKeysFingerprints.size();
             for (uint32_t a = 0; a < count1; a++) {
+                DEBUG_E("=== Received fingerprint from server[%d]: %llu ===", a, (unsigned long long)result->server_public_key_fingerprints[a]);
                 for (uint32_t b = 0; b < count2; b++) {
+                    DEBUG_E("=== Expected fingerprint[%d]: %llu ===", b, (unsigned long long)serverPublicKeysFingerprints[b]);
                     if ((uint64_t) result->server_public_key_fingerprints[a] == serverPublicKeysFingerprints[b]) {
                         keyFingerprint = result->server_public_key_fingerprints[a];
                         key = serverPublicKeys[b];
+                        DEBUG_E("=== FINGERPRINT MATCH! ===");
                         break;
                     }
                 }
@@ -450,8 +453,8 @@ void Handshake::processHandshakeResponse_resPQ(TLObject *message, int64_t messag
             innerData = tl_p_q_inner_data;
         } else {
             auto tl_p_q_inner_data_temp = new TL_p_q_inner_data_temp_dc();
-            tl_p_q_inner_data_temp->nonce = std::make_unique<ByteArray>(new ByteArray(authNonce));
-            tl_p_q_inner_data_temp->server_nonce = std::make_unique<ByteArray>(new ByteArray(authServerNonce));
+            tl_p_q_inner_data_temp->nonce = std::make_unique<ByteArray>(authNonce);
+            tl_p_q_inner_data_temp->server_nonce = std::make_unique<ByteArray>(authServerNonce);
             tl_p_q_inner_data_temp->pq = std::make_unique<ByteArray>(new ByteArray(result->pq.get()));
             tl_p_q_inner_data_temp->p = std::make_unique<ByteArray>(new ByteArray(request->p.get()));
             tl_p_q_inner_data_temp->q = std::make_unique<ByteArray>(new ByteArray(request->q.get()));
